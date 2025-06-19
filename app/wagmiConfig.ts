@@ -5,7 +5,7 @@ import { getDefaultConfig } from "connectkit";
 export const wagmiConfig = createConfig(
   getDefaultConfig({
     chains: [base],
-    appName: "Leprechaun",
+    appName: "Cambi",
     walletConnectProjectId: process.env.CLOUD_REOWN_KEY as string,
     ssr: true,
     transports: {

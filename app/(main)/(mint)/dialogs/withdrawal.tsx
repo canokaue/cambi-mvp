@@ -317,9 +317,9 @@ export const WithdrawalDialog = ({
               <span className="font-medium">New Ratio:</span>{" "}
               {newRatio.toFixed(2)}%
               <div
-                className={`text-xs ${newRatio < 150 ? "text-red-500" : newRatio > 200 ? "text-green-500" : "text-yellow-500"}`}
+                className={`text-xs ${newRatio < 125 ? "text-red-500" : newRatio > 200 ? "text-green-500" : "text-yellow-500"}`}
               >
-                {newRatio < 150
+                {newRatio < 125
                   ? "⚠️ Danger zone"
                   : newRatio < 180
                     ? "⚠️ Close to liquidation threshold"

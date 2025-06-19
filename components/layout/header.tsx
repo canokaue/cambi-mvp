@@ -6,11 +6,7 @@ import { CustomConnectButton } from "./connect-button";
 const routes = {
   mint: {
     href: "/",
-    label: "Mint",
-  },
-  trade: {
-    href: "/trade",
-    label: "Trade",
+    label: "",
   },
 };
 
@@ -20,17 +16,15 @@ export const Header = ({
   activeRoute?: keyof typeof routes;
 }) => {
   return (
-    <header className="p-8 flex items-center">
+    <header className="p-8 flex items-center relative z-20">
       <Link href="/" className="flex gap-2">
         <Image
-          src="/logo-coin.svg"
-          width={24}
-          height={24}
-          alt="Leprechaun Logo"
+          src="/cambi.svg"
+          width={160}
+          height={40}
+          alt="Cambi Logo"
         />
-        <span className="leading-none uppercase font-black text-transparent trailing-[-5%] bg-clip-text gold-gradient text-2xl max-sm:hidden">
-          Leprechaun
-        </span>
+
       </Link>
       <div className="ml-12 max-sm:ml-4 font-semibold flex gap-6 max-sm:gap-3 max-sm:text-sm">
         {Object.entries(routes).map(([key, route]) => (

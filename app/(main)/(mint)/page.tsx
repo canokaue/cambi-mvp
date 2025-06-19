@@ -73,6 +73,8 @@ import { ClosePositionDialog } from "./dialogs/close-position";
 import { DepositDialog } from "./dialogs/deposit";
 import { sendTxSentToast, sendTxSuccessToast } from "./dialogs/toasts";
 import { WithdrawalDialog } from "./dialogs/withdrawal";
+import { BackgroundDecorations } from "@/components/BackgroundDecorations";
+
 
 const TokenSelectorButton = ({
   selectedSymbol,
@@ -109,38 +111,38 @@ const TokenSelectorButton = ({
 
 const collateralAssets: SyntheticAssetInfo[] = [
   {
-    tokenAddress: constants.mWBTCAddress,
+    tokenAddress: constants.WBTCAddress,
     name: "Bitcoin",
-    symbol: "mWBTC",
+    symbol: "WBTC",
     isActive: true,
     decimals: 8,
   },
   {
-    tokenAddress: constants.mWETHAddress,
+    tokenAddress: constants.WETHAddress,
     name: "Wrapped Ether",
-    symbol: "mWETH",
+    symbol: "WETH",
     decimals: 18,
     isActive: true,
   },
   {
-    tokenAddress: constants.mUSDCAddress,
+    tokenAddress: constants.USDCAddress,
     name: "USDC",
-    symbol: "mUSDC",
+    symbol: "USDC",
     isActive: true,
     decimals: 6,
   },
 ];
 
-const mUSDCContract = {
-  address: constants.mUSDCAddress,
+const USDCContract = {
+  address: constants.USDCAddress,
   abi: constants.ERC20ABI,
 } as const;
-const mWETHContract = {
-  address: constants.mWETHAddress,
+const WETHContract = {
+  address: constants.WETHAddress,
   abi: constants.ERC20ABI,
 } as const;
-const mWBTCContract = {
-  address: constants.mWBTCAddress,
+const WBTCContract = {
+  address: constants.WBTCAddress,
   abi: constants.ERC20ABI,
 } as const;
 const lensContract = {
@@ -154,11 +156,11 @@ const factoryContract = {
 
 function getDecimalsPerCollateralSymbol(symbol: string): number {
   switch (symbol) {
-    case "mUSDC":
+    case "USDC":
       return 6;
-    case "mWETH":
+    case "WETH":
       return 18;
-    case "mWBTC":
+    case "WBTC":
       return 8;
     default:
       return 0;
@@ -169,11 +171,11 @@ function getInputDecimalsPerCollateralSymbol(
   symbol: string | undefined,
 ): number {
   switch (symbol) {
-    case "mUSDC":
+    case "USDC":
       return 2;
-    case "mWETH":
+    case "WETH":
       return 4;
-    case "mWBTC":
+    case "WBTC":
       return 8;
     default:
       return 2;
@@ -202,32 +204,32 @@ export default function Home() {
   const allowanceAndBalanceContract = useReadContracts({
     contracts: [
       {
-        ...mUSDCContract,
+        ...USDCContract,
         functionName: "balanceOf",
         args: [account.address],
       },
       {
-        ...mWETHContract,
+        ...WETHContract,
         functionName: "balanceOf",
         args: [account.address],
       },
       {
-        ...mWBTCContract,
+        ...WBTCContract,
         functionName: "balanceOf",
         args: [account.address],
       },
       {
-        ...mUSDCContract,
+        ...USDCContract,
         functionName: "allowance",
         args: [account.address, positionManagerAddress],
       },
       {
-        ...mWETHContract,
+        ...WETHContract,
         functionName: "allowance",
         args: [account.address, positionManagerAddress],
       },
       {
-        ...mWBTCContract,
+        ...WBTCContract,
         functionName: "allowance",
         args: [account.address, positionManagerAddress],
       },
@@ -237,12 +239,12 @@ export default function Home() {
     },
   });
   const [
-    mUSDCBalance,
-    mWETHBalance,
-    mWBTCBalance,
-    mUSDCAllowance,
-    mWETHAllowance,
-    mWBTCAllowance,
+    USDCBalance,
+    WETHBalance,
+    WBTCBalance,
+    USDCAllowance,
+    WETHAllowance,
+    WBTCAllowance,
   ] = allowanceAndBalanceContract.data || [];
 
   const formattedAssets = useMemo(() => {
@@ -266,19 +268,19 @@ export default function Home() {
 
   const collateralAssetsWithBalance = useMemo(() => {
     if (
-      mUSDCBalance?.status !== "success" ||
-      mWBTCBalance?.status !== "success" ||
-      mWETHBalance?.status !== "success"
+      USDCBalance?.status !== "success" ||
+      WBTCBalance?.status !== "success" ||
+      WETHBalance?.status !== "success"
     ) {
       return collateralAssets;
     }
 
-    const tempArray = [mWBTCBalance, mWETHBalance, mUSDCBalance];
+    const tempArray = [WBTCBalance, WETHBalance, USDCBalance];
     return collateralAssets.map((col, i) => ({
       ...col,
       balance: tempArray[i].result as bigint,
     }));
-  }, [mUSDCBalance, mWBTCBalance, mWETHBalance]);
+  }, [USDCBalance, WBTCBalance, WETHBalance]);
 
   const [mintTokenSelectorOpen, setMintTokenSelectorOpen] = useState(false);
   const [collateralTokenSelectorOpen, setCollateralTokenSelectorOpen] =
@@ -354,7 +356,7 @@ export default function Home() {
 
   const minCollateralRatio = useMemo(() => {
     const result = getMinCollateralRatioContract.data as bigint;
-    const minCollateralRatio = result ? Number(result) / 100 : 150;
+    const minCollateralRatio = result ? Number(result) / 100 : 115;
 
     const currentCollateralRatio = form.getValues().collateralRatio;
 
@@ -382,14 +384,14 @@ export default function Home() {
     let _allowance;
 
     switch (collateralWatched.symbol) {
-      case "mUSDC":
-        _allowance = mUSDCAllowance;
+      case "USDC":
+        _allowance = USDCAllowance;
         break;
-      case "mWETH":
-        _allowance = mWETHAllowance;
+      case "WETH":
+        _allowance = WETHAllowance;
         break;
-      case "mWBTC":
-        _allowance = mWBTCAllowance;
+      case "WBTC":
+        _allowance = WBTCAllowance;
         break;
 
       default:
@@ -400,7 +402,7 @@ export default function Home() {
     if (!result) return null;
 
     return BigInt(result);
-  }, [collateralWatched, mUSDCAllowance, mWBTCAllowance, mWETHAllowance]);
+  }, [collateralWatched, USDCAllowance, WBTCAllowance, WETHAllowance]);
 
   const handleSubmitMint = form.handleSubmit(async (data) => {
     if ((allowance || 0) < cleanCollateralAmount!) {
@@ -410,7 +412,7 @@ export default function Home() {
         abi,
         address: data.collateral.tokenAddress,
         functionName: "approve",
-        args: [positionManagerAddress, cleanCollateralAmount],
+        args: [positionManagerAddress, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")],
       });
 
       sendTxSentToast(approvalTxHash);
@@ -443,35 +445,14 @@ export default function Home() {
 
       sendTxSentToast(createPositionTxHash);
 
-      const confirmationTx = await waitForTransactionReceipt(wagmiConfig, {
+      await waitForTransactionReceipt(wagmiConfig, {
         hash: createPositionTxHash,
         confirmations: 3,
       });
 
-      const poolHash = constants.getUniswapPoolHash(data.mint.symbol)
-
-      toast.success("Transaction confirmed.", {
-        action: {
-          label: (
-            <div className="flex gap-2 items-center">
-              <Image
-                src="/uniswap.svg"
-                alt="Uniswap Logo"
-                width={24}
-                height={24}
-              />
-              Pool on Uniswap
-            </div>
-          ),
-          onClick: () => {
-            // TODO: Update this to Pool URL
-            window.open(
-              `https://app.uniswap.org/explore/pools/base/${poolHash}`,
-              "_blank",
-            );
-          },
-        },
-      });
+      // const poolHash = constants.getUniswapPoolHash(data.mint.symbol)
+// 
+      toast.success("Transaction confirmed.");
 
       await openPositionsContractCall.refetch();
       form.reset();
@@ -480,23 +461,23 @@ export default function Home() {
     await allowanceAndBalanceContract.refetch();
   });
 
-  async function mintMockCollateral(mock: "mUSDC" | "mWETH" | "mWBTC") {
+  async function mintMockCollateral(mock: "USDC" | "WETH" | "WBTC") {
     const abi = constants.SyntheticAssetABI;
 
     let contractAddress: `0x${string}` | null = null;
     let amount = BigInt(0);
 
     switch (mock) {
-      case "mWBTC":
-        contractAddress = constants.mWBTCAddress;
+      case "WBTC":
+        contractAddress = constants.WBTCAddress;
         amount = BigInt(1) * BigInt(10 ** 8);
         break;
-      case "mWETH":
-        contractAddress = constants.mWETHAddress;
+      case "WETH":
+        contractAddress = constants.WETHAddress;
         amount = BigInt(50) * BigInt(10 ** 18);
         break;
-      case "mUSDC":
-        contractAddress = constants.mUSDCAddress;
+      case "USDC":
+        contractAddress = constants.USDCAddress;
         amount = BigInt(100_000) * BigInt(10 ** 6);
         break;
 
@@ -622,14 +603,14 @@ export default function Home() {
     let _allowance;
 
     switch (selectedPositionCollateral.symbol) {
-      case "mUSDC":
-        _allowance = mUSDCAllowance;
+      case "USDC":
+        _allowance = USDCAllowance;
         break;
-      case "mWETH":
-        _allowance = mWETHAllowance;
+      case "WETH":
+        _allowance = WETHAllowance;
         break;
-      case "mWBTC":
-        _allowance = mWBTCAllowance;
+      case "WBTC":
+        _allowance = WBTCAllowance;
         break;
 
       default:
@@ -640,10 +621,25 @@ export default function Home() {
     if (!result) return null;
 
     return BigInt(result);
-  }, [selectedPosition, mUSDCAllowance, mWETHAllowance, mWBTCAllowance]);
+  }, [selectedPosition, USDCAllowance, WETHAllowance, WBTCAllowance]);
+
+  const lockPeriodWatched = form.watch("lockPeriod") as number;
+
+  // Mock APY calculation based on lock period
+  const targetAPY = useMemo(() => {
+    switch (lockPeriodWatched) {
+      case 3: return 8.0;
+      case 6: return 10.0;
+      case 12: return 11.0;
+      case 18: return 12.0;
+      default: return 8.0;
+    }
+  }, [lockPeriodWatched]);
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
+    <div className="flex flex-col min-h-screen w-full relative z-10">
+      <BackgroundDecorations /> 
+
       <DepositDialog
         position={selectedPosition}
         collateral={selectedPositionCollateral}
@@ -701,27 +697,27 @@ export default function Home() {
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
               <Button
-                variant="secondary"
+                variant="default"  // Change from "secondary" to "default"
                 disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("mUSDC")}
+                onClick={() => mintMockCollateral("USDC")}
               >
-                Mint mUSDC
+                USDC
               </Button>
 
               <Button
-                variant="secondary"
+                variant="default"  // Change from "secondary" to "default"
                 disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("mWETH")}
+                onClick={() => mintMockCollateral("WETH")}
               >
-                Mint mWETH
+                WETH
               </Button>
 
               <Button
-                variant="secondary"
+                variant="default"  // Change from "secondary" to "default"
                 disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("mWBTC")}
+                onClick={() => mintMockCollateral("WBTC")}
               >
-                Mint mWBTC
+                WBTC
               </Button>
             </div>
           </CardContent>
@@ -919,18 +915,18 @@ export default function Home() {
                 <FormField
                   control={form.control}
                   name="collateralRatio"
-                  defaultValue={150}
-                  rules={{
-                    required: "Collateral Ratio is required",
-                    min: {
-                      value: 150,
-                      message: "Collateral Ratio must be at least 150%",
-                    },
-                    max: {
-                      value: 250,
-                      message: "Collateral Ratio must be at most 250%",
-                    },
-                  }}
+                  defaultValue={115}
+                  // rules={{
+                  //   required: "Collateral Ratio is required",
+                  //   min: {
+                  //     value: 150,
+                  //     message: "Collateral Ratio must be at least 150%",
+                  //   },
+                  //   max: {
+                  //     value: 250,
+                  //     message: "Collateral Ratio must be at most 250%",
+                  //   },
+                  // }}
                   render={({ field, fieldState }) => (
                     <FormItem>
                       <FormLabel className="mb-2">
@@ -962,6 +958,40 @@ export default function Home() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="lockPeriod"
+                  defaultValue={3}
+                  rules={{
+                    required: "Lock period is required",
+                  }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="mb-2">
+                        Lock Period ({lockPeriodWatched} months) - Target APY: {targetAPY}%
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={3}
+                          max={12}
+                          step={3}
+                          {...field}
+                          value={[field.value]}
+                          onValueChange={(value) => {
+                            field.onChange(value[0]);
+                          }}
+                        />
+                      </FormControl>
+                      <span className="flex flex-row justify-between text-neutral-400">
+                        <span>3 months</span>
+                        <span>6 months</span>
+                        <span>12 months</span>
+                        <span>18 months</span>
+                      </span>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="flex flex-col w-full mt-2">
                   <Button
                     disabled={
@@ -985,9 +1015,6 @@ export default function Home() {
                   </Button>
                 </div>
                 <CardFooter>
-                  <div className="w-full text-center text-xs text-neutral-400">
-                    You can only mint during market hours.
-                  </div>
                 </CardFooter>
               </div>
             </CardContent>

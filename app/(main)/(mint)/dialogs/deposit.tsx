@@ -24,7 +24,7 @@ import { DialogProps } from "@radix-ui/react-dialog";
 import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 import useDebouncedCallback from "beautiful-react-hooks/useDebouncedCallback";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
+// import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -61,7 +61,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
     let textColor;
     let text;
 
-    if (newRatio < 150) {
+    if (newRatio < 125) {
       textColor = "text-red-500";
       text = "⚠️ Danger zone";
     } else if (newRatio > 180) {
@@ -91,7 +91,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
         abi,
         address: props.collateral.tokenAddress,
         functionName: "approve",
-        args: [constants.PositionManagerAddress, cleanCollateralAmount],
+        args: [constants.PositionManagerAddress, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")],
       });
 
       sendTxSentToast(approvalTxHash);
@@ -123,34 +123,14 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
 
       sendTxSentToast(createPositionTxHash);
 
-      const confirmationTx = await waitForTransactionReceipt(wagmiConfig, {
+      await waitForTransactionReceipt(wagmiConfig, {
         hash: createPositionTxHash,
         confirmations: 3,
       });
 
-      const poolHash = constants.getUniswapPoolHash(props.position.syntheticSymbol)
+      // const poolHash = constants.getUniswapPoolHash(props.position.syntheticSymbol)
 
-      toast.success("Transaction confirmed.", {
-        action: {
-          label: (
-            <div className="flex gap-2 items-center">
-              <Image
-                src="/uniswap.svg"
-                alt="Uniswap Logo"
-                width={24}
-                height={24}
-              />
-              Pool on Uniswap
-            </div>
-          ),
-          onClick: () => {
-            window.open(
-              `https://app.uniswap.org/explore/pools/base/${poolHash}`,
-              "_blank",
-            );
-          },
-        },
-      });
+      toast.success("Transaction confirmed.");
 
       props.onOpenChange?.(false);
     }

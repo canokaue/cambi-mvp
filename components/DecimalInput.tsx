@@ -1,12 +1,5 @@
 import { Input } from "@/components/ui/input";
 
-const getFormatter = (digits: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "decimal",
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
-
 export const DecimalInput = ({
   placeholder = "0.00",
   digits = 2,
@@ -18,24 +11,27 @@ export const DecimalInput = ({
 } & React.ComponentProps<"input">) => {
   return (
     <Input
+      type="number"
+      step={`0.${"0".repeat(Math.max(0, digits - 1))}1`}
+      min="0"
       placeholder={placeholder}
-      {...props}
-      // We don't want to pass the value prop to the input, because it will cause
-      // the input to be controlled and uncontrolled at the same time.
-      value={undefined}
+      onWheel={(e) => e.currentTarget.blur()} // Disable scroll to change value
       onChange={(e) => {
-        const inputValue = e.target.value.replace(/[^0-9]/g, "");
-        const number = Number(inputValue) / 10 ** digits;
-        if (number === 0) {
-          e.target.value = "";
-          onChange?.(0);
+        const value = e.target.value;
+        
+        if (value === "") {
+          onChange?.(undefined);
           return;
         }
-
-        const formattedValue = getFormatter(digits).format(number);
-        e.target.value = formattedValue;
-        onChange?.(number);
+        
+        const number = parseFloat(value);
+        if (!isNaN(number) && number >= 0) {
+          // Round to specified digits
+          const rounded = Math.round(number * (10 ** digits)) / (10 ** digits);
+          onChange?.(rounded);
+        }
       }}
+      {...props}
     />
   );
 };

@@ -1,10 +1,10 @@
-# Leprechaun Protocol Frontend
+# Cambi Protocol Frontend
 
-This repository contains the frontend application for the Leprechaun Protocol, a decentralized finance (DeFi) system that enables users to create synthetic assets backed by collateral.
+This repository contains the frontend application for the Cambi Protocol, a decentralized finance (DeFi) system that enables users to create synthetic assets backed by collateral.
 
 ## Overview
 
-Leprechaun Protocol allows users to mint synthetic assets (such as synthetic DOW, Gold, or Oil) by depositing various types of collateral. The frontend provides an intuitive interface for:
+Cambi Protocol allows users to mint synthetic assets (such as synthetic DOW, Gold, or Oil) by depositing various types of collateral. The frontend provides an intuitive interface for:
 
 - Creating and managing collateralized debt positions (CDPs)
 - Minting new synthetic assets
@@ -18,7 +18,7 @@ Leprechaun Protocol allows users to mint synthetic assets (such as synthetic DOW
 - **Position Creation**: Create new positions by depositing collateral and minting synthetic assets
 - **Position Management**: Deposit, withdraw, and close positions with an intuitive UI
 - **Real-time Calculations**: Dynamic collateral ratio calculations and preview of operations
-- **Collateral Management**: Support for multiple collateral types (mUSDC, mWETH, mWBTC)
+- **Collateral Management**: Support for multiple collateral types (USDC, WETH, WBTC)
 - **Risk Visualization**: Clear indicators for position health and liquidation risk
 - **Transaction Feedback**: Toast notifications for transaction status and confirmations
 
@@ -59,8 +59,8 @@ The frontend is organized into several key components:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/leprechaun-frontend.git
-cd leprechaun-frontend
+git clone https://github.com/yourusername/cambi-frontend.git
+cd cambi-frontend
 ```
 
 2. Install dependencies:
@@ -98,20 +98,7 @@ Your active positions are displayed in the table at the bottom of the page. For 
 
 ### Using Mock Tokens
 
-For testing purposes, you can mint mock tokens (mUSDC, mWETH, mWBTC) using the buttons in the mint form. This is only available on test networks.
-
-## Contract Addresses
-
-The application interacts with the following smart contracts on the Base Network:
-
-- **LeprechaunFactory**: `0x364A6127A8b425b6857f4962412b0664D257BDD5`
-- **PositionManager**: `0x401d1cD4D0ff1113458339065Cf9a1f2e8425afb`
-- **OracleInterface**: `0xBc2e651eD3566c6dF862815Ed05b99eFb9bC0255`
-- **LeprechaunLens**: `0x80d4D0e68efDBB8b16fdD1e8ff7511ecc3869503`
-- **Mock Tokens**:
-  - mUSDC: `0x39510c9f9E577c65b9184582745117341e7bdD73`
-  - mWETH: `0x95539ce7555F53dACF3a79Ff760C06e5B4e310c3`
-  - mWBTC: `0x1DBf5683c73E0D0A0e20AfC76F924e08E95637F7`
+For testing purposes, you can mint mock tokens (USDC, WETH, WBTC) using the buttons in the mint form. This is only available on test networks.
 
 ## Key Components
 
@@ -119,7 +106,7 @@ The application interacts with the following smart contracts on the Base Network
 
 The main interface allows users to:
 
-1. Select a collateral type (mUSDC, mWETH, mWBTC)
+1. Select a collateral type (USDC, WETH, WBTC)
 2. Enter the amount of collateral to deposit
 3. Select the synthetic asset to mint
 4. Set a target collateral ratio (with minimum safety requirements)

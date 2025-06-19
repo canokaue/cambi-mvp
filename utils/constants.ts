@@ -9,31 +9,26 @@ import { SyntheticAssetABI } from "@/utils/abis/SyntheticAsset";
 export const rpcUrl =
   "https://base-mainnet.infura.io/v3/" + process.env.NEXT_PUBLIC_INFURA_KEY;
 
-export const usdcAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-export const icoAddress = "0x99ECa4843D85b73b4EEA8e987B63B77763DAadFd";
-export const lprAddress = "0x7AD3b12d91e81ebd218f9acF55E2A699d7f68A33";
 
 export const LeprechaunFactoryAddress =
-  "0x364A6127A8b425b6857f4962412b0664D257BDD5";
+  "0xdc42AC5e79423242342B3cE83344cd81Ba43A51D";
 export const PositionManagerAddress =
-  "0x401d1cD4D0ff1113458339065Cf9a1f2e8425afb";
+  "0x3F9e6Fe82D83A41712C855eFA18367412d1a6d52";
 export const OracleInterfaceAddress =
-  "0xBc2e651eD3566c6dF862815Ed05b99eFb9bC0255";
-export const LENSAddress = "0x80d4D0e68efDBB8b16fdD1e8ff7511ecc3869503";
+  "0x27E7F27b7882C82dB396b5042f7E7665c1957054";
+export const LENSAddress = "0x7fd72cce53eceb612683ee56059f6517d322e6dd";
 
-export const sDOWAddress = "0xD14F0B478F993967240Aa5995eb2b1Ca6810969a";
-
-export const mUSDCAddress = "0x39510c9f9E577c65b9184582745117341e7bdD73";
-export const mWETHAddress = "0x95539ce7555F53dACF3a79Ff760C06e5B4e310c3";
-export const mWBTCAddress = "0x1DBf5683c73E0D0A0e20AfC76F924e08E95637F7";
+export const USDCAddress = "0x0eb400A78954c2503961890a56B6A460D69e417d";
+export const WETHAddress = "0x37B7e6F4c89846E30dF2D7ae9D51Fe22a79e3420";
+export const WBTCAddress = "0xc24F57bF0FF87283e30634a2Ff7b44c6A5a67d13";
 
 export const assetsImages: Record<string, string> = {
-  sDOW: "/assets/us.svg",
-  sXAU: "/assets/gold.svg",
+  CUSD: "/assets/cmUSD.svg",
+  CBRL: "/assets/cmBRL.svg",
   sOIL: "/assets/oil.svg",
-  mWBTC: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-  mWETH: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-  mUSDC: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+  WBTC: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+  WETH: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+  USDC: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
 };
 
 export {
@@ -45,20 +40,20 @@ export {
   SyntheticAssetABI,
 };
 
-export function getUniswapPoolHash(sAssetSymbol: string): string {
-    switch (sAssetSymbol) {
-      case "sDOW":
-        return "0x35fe68d317f15c3db528192cf0e71eff2265babaaaee23d7192b98703729bd89";
+// export function getUniswapPoolHash(sAssetSymbol: string): string {
+//   switch (sAssetSymbol) {
+//     case "sDOW":
+//       return "0x35fe68d317f15c3db528192cf0e71eff2265babaaaee23d7192b98703729bd89";
 
-      case "sXAU":
-        return "0x4a880171e7bfbee7a8f390ac3fe36245baecc1b7064e399ad042c5e85a010651";
+//     case "sXAU":
+//       return "0x4a880171e7bfbee7a8f390ac3fe36245baecc1b7064e399ad042c5e85a010651";
 
-      case "sOIL":
-        return "0xfb6d04fbc133f88ee966239857c3b9f1c005a5aba87497dad853d175bc819451";
+//     case "sOIL":
+//       return "0xfb6d04fbc133f88ee966239857c3b9f1c005a5aba87497dad853d175bc819451";
 
-      default:
-        return "";
-    }
-}
+//     default:
+//       return "";
+//   }
+// }
 
 export const EXPLORER_URL = "https://basescan.org/"
