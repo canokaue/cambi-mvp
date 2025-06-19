@@ -11,20 +11,20 @@ export const rpcUrl =
 
 
 export const LeprechaunFactoryAddress =
-  "0xdc42AC5e79423242342B3cE83344cd81Ba43A51D";
+  "0x59e41680eba8c90864D373efbAFD1d9dcC71DB2f";
 export const PositionManagerAddress =
-  "0x3F9e6Fe82D83A41712C855eFA18367412d1a6d52";
+  "0x0aff82a808b2740FfaF37FaE5b16fd918fDb4405";
 export const OracleInterfaceAddress =
-  "0x27E7F27b7882C82dB396b5042f7E7665c1957054";
-export const LENSAddress = "0x7fd72cce53eceb612683ee56059f6517d322e6dd";
+  "0x2704347E129f4EDaE6E388217695a2c24fcB4441";
+export const LENSAddress = "0xab3100F3FE310662Df9948444A87f1Dbb860e6d4";
 
-export const USDCAddress = "0x0eb400A78954c2503961890a56B6A460D69e417d";
-export const WETHAddress = "0x37B7e6F4c89846E30dF2D7ae9D51Fe22a79e3420";
-export const WBTCAddress = "0xc24F57bF0FF87283e30634a2Ff7b44c6A5a67d13";
+export const USDCAddress = "0xe5331cf2438521D545Ba4184A490ddA0e5880fd4";
+export const WETHAddress = "0xCb793Cd5f5e7a19e892478644209501C2959B68D";
+export const WBTCAddress = "0x6BC47C35E5a9E96Bc1b4494212Dc2Eb669d2cD3d";
 
 export const assetsImages: Record<string, string> = {
-  CUSD: "/assets/cmUSD.svg",
-  CBRL: "/assets/cmBRL.svg",
+  cmUSD: "/assets/cmUSD.svg",
+  cmBRL: "/assets/cmBRL.svg",
   sOIL: "/assets/oil.svg",
   WBTC: "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
   WETH: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
