@@ -38,9 +38,7 @@ export interface PositionDialogProps extends DialogProps {
   onSuccess?: () => void;
 }
 
-export const WithdrawalDialog = ({
-  ...props
-}: PositionDialogProps) => {
+export const WithdrawalDialog = ({ ...props }: PositionDialogProps) => {
   const form = useForm();
   const [maxWithdrawable, setMaxWithdrawable] = useState<bigint | null>(null);
   const [newRatio, setNewRatio] = useState<number | null>(null);
@@ -60,11 +58,15 @@ export const WithdrawalDialog = ({
       calculateMaxWithdrawable();
 
       if (amountWatched && props.collateral) {
-        handleWithdrawalAmountChange(amountWatched, props.position, props.collateral)
+        handleWithdrawalAmountChange(
+          amountWatched,
+          props.position,
+          props.collateral
+        );
       }
     } else {
-      form.reset()
-      setMaxWithdrawable(null)
+      form.reset();
+      setMaxWithdrawable(null);
       setNewRatio(null);
       setFeeAmount(null);
     }
@@ -81,7 +83,7 @@ export const WithdrawalDialog = ({
       //   functionName: "getEffectiveCollateralRatio",
       //   args: [props.position.syntheticAsset, props.position.collateralAsset],
       // });
-      setLoading(true)
+      setLoading(true);
 
       // Calculate required collateral based on debt
       const requiredCollateral = await readContract(wagmiConfig, {
@@ -105,29 +107,26 @@ export const WithdrawalDialog = ({
       } else {
         setMaxWithdrawable(BigInt(0));
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       console.error("Error calculating max withdrawable:", error);
       setMaxWithdrawable(BigInt(0));
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   const handleWithdrawalAmountChange = useDebouncedCallback(
     async (amount, position, collateral) => {
-
       try {
-        setLoading(true)
+        setLoading(true);
         const withdrawAmount = BigInt(
-          Math.floor(
-            Number(amount) * 10 ** (collateral.decimals as number),
-          ),
+          Math.floor(Number(amount) * 10 ** (collateral.decimals as number))
         );
 
         // Ensure not trying to withdraw more than available
         if (withdrawAmount > position.collateralAmount) {
-          setLoading(false)
-          setInvalid(true)
+          setLoading(false);
+          setInvalid(true);
           toast.error("Cannot withdraw more than available collateral");
           return;
         }
@@ -144,8 +143,7 @@ export const WithdrawalDialog = ({
         setFeeAmount(fee);
 
         // Calculate new ratio after withdrawal
-        const remainingCollateral =
-          position.collateralAmount - withdrawAmount;
+        const remainingCollateral = position.collateralAmount - withdrawAmount;
 
         // Get USD values
         const collateralUsdValue = await readContract(wagmiConfig, {
@@ -165,19 +163,19 @@ export const WithdrawalDialog = ({
           const newCollateralRatio =
             Number(
               ((collateralUsdValue as bigint) * BigInt(10000)) /
-                (debtUsdValue as bigint),
+                (debtUsdValue as bigint)
             ) / 100;
           setNewRatio(newCollateralRatio);
         }
-        setLoading(false)
-        setInvalid(false)
+        setLoading(false);
+        setInvalid(false);
       } catch (error) {
         console.error("Error calculating new ratio:", error);
-        setLoading(false)
+        setLoading(false);
       }
     },
     [props.collateral, props.position],
-    800,
+    800
   );
 
   const handleSubmit = form.handleSubmit(async (data) => {
@@ -193,7 +191,6 @@ export const WithdrawalDialog = ({
       const amountString = data.amount.toString();
       const amountInWei = parseUnits(amountString, decimals);
 
-
       // Check if new ratio would be safe
       if (newRatio !== null) {
         const effectiveRatio = await readContract(wagmiConfig, {
@@ -207,7 +204,11 @@ export const WithdrawalDialog = ({
 
         if (newRatio < minRequiredRatio) {
           toast.error(
-            `New ratio (${newRatio.toFixed(2)}%) would be below minimum required ratio (${minRequiredRatio.toFixed(2)}%)`,
+            `New ratio (${newRatio.toFixed(
+              2
+            )}%) would be below minimum required ratio (${minRequiredRatio.toFixed(
+              2
+            )}%)`
           );
           setIsSubmitting(false);
           return;
@@ -224,16 +225,13 @@ export const WithdrawalDialog = ({
 
       sendTxSentToast(hash);
 
-      const txHash = await waitForTransactionReceipt(
-        wagmiConfig,
-        {
-          hash: hash,
-          confirmations: 3,
-        },
-      );
+      const txHash = await waitForTransactionReceipt(wagmiConfig, {
+        hash: hash,
+        confirmations: 3,
+      });
       sendTxSuccessToast(txHash.transactionHash);
       setIsSubmitting(false);
-      props.onSuccess?.()
+      props.onSuccess?.();
       props.onOpenChange?.(false);
     } catch (error) {
       console.error("Withdrawal error:", error);
@@ -266,7 +264,7 @@ export const WithdrawalDialog = ({
                 ? parseBigInt(
                     props.position.collateralAmount,
                     props.collateral?.decimals || 0,
-                    4,
+                    4
                   )
                 : "0"}{" "}
               {props.position?.collateralSymbol}
@@ -284,7 +282,7 @@ export const WithdrawalDialog = ({
                 ? parseBigInt(
                     maxWithdrawable,
                     props.collateral?.decimals || 0,
-                    4,
+                    4
                   )
                 : "0"}{" "}
               {props.position?.collateralSymbol}
@@ -297,9 +295,7 @@ export const WithdrawalDialog = ({
               <FormItem>
                 <FormLabel>Amount to Withdraw</FormLabel>
                 <FormControl>
-                  <DecimalInput
-                    {...field}
-                  />
+                  <DecimalInput {...field} />
                 </FormControl>
                 <FormMessage>{fieldState.error?.message}</FormMessage>
               </FormItem>
@@ -317,15 +313,21 @@ export const WithdrawalDialog = ({
               <span className="font-medium">New Ratio:</span>{" "}
               {newRatio.toFixed(2)}%
               <div
-                className={`text-xs ${newRatio < 125 ? "text-red-500" : newRatio > 200 ? "text-green-500" : "text-yellow-500"}`}
+                className={`text-xs ${
+                  newRatio < 125
+                    ? "text-red-500"
+                    : newRatio > 200
+                    ? "text-green-500"
+                    : "text-yellow-500"
+                }`}
               >
                 {newRatio < 125
                   ? "⚠️ Danger zone"
                   : newRatio < 180
-                    ? "⚠️ Close to liquidation threshold"
-                    : newRatio > 250
-                      ? "✅ Very safe position"
-                      : "✅ Safe position"}
+                  ? "⚠️ Close to liquidation threshold"
+                  : newRatio > 250
+                  ? "✅ Very safe position"
+                  : "✅ Safe position"}
               </div>
             </div>
           )}
@@ -333,9 +335,14 @@ export const WithdrawalDialog = ({
             <DialogClose asChild>
               <Button variant="secondary">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleSubmit} disabled={isSubmitting || !amountWatched || loading|| invalid}>
-              {invalid? "Invalid": "Withdraw"}
-              {(loading || isSubmitting) && <Loader2 className="animate-spin size-3" />}
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || !amountWatched || loading || invalid}
+            >
+              {invalid ? "Invalid" : "Withdraw"}
+              {(loading || isSubmitting) && (
+                <Loader2 className="animate-spin size-3" />
+              )}
             </Button>
           </DialogFooter>
         </Form>

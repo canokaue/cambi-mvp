@@ -23,7 +23,7 @@ export const ConnectButton = () => {
       onClick: () => handleClick(),
       children: account.status === "connected" ? "Disconnect" : "Connect",
     }),
-    [account.status, handleClick],
+    [account.status, handleClick]
   );
 
   return (

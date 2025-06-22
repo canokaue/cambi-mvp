@@ -1,10 +1,11 @@
 # Cambi Protocol Frontend
 
-This repository contains the frontend application for the Cambi Protocol, a decentralized finance (DeFi) system that enables users to create synthetic assets backed by collateral.
+This repository contains the frontend application for Cambi Protocol, a permissionless collateral-backed yield protocol that enables users to access high-yield Latin American bonds and receivables through synthetic assets.
 
 ## Overview
 
-Cambi Protocol allows users to mint synthetic assets (such as synthetic DOW, Gold, or Oil) by depositing various types of collateral. The frontend provides an intuitive interface for:
+Cambi Protocol allows users to deposit Bitcoin, Ethereum, or stablecoins to mint yield-bearing synthetic assets (cmBTC, cmUSD, cmBRL) that automatically appreciate through rebasing. The protocol bridges Bitcoin holders with tokenized Brazilian receivables, government bonds, and other high-yield real-world assets.
+The frontend provides an intuitive interface for:
 
 - Creating and managing collateralized debt positions (CDPs)
 - Minting new synthetic assets

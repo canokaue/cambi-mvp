@@ -91,7 +91,12 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
         abi,
         address: props.collateral.tokenAddress,
         functionName: "approve",
-        args: [constants.PositionManagerAddress, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")],
+        args: [
+          constants.PositionManagerAddress,
+          BigInt(
+            "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          ),
+        ],
       });
 
       sendTxSentToast(approvalTxHash);
@@ -101,7 +106,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
         {
           hash: approvalTxHash,
           confirmations: 3,
-        },
+        }
       );
 
       sendTxSuccessToast(approvalConfirmationTxHash.transactionHash);
@@ -110,8 +115,8 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
 
       const amountInWei = BigInt(
         Math.floor(
-          data.collateralAmount * 10 ** (props.collateral?.decimals as number),
-        ),
+          data.collateralAmount * 10 ** (props.collateral?.decimals as number)
+        )
       );
 
       const createPositionTxHash = await writeContractAsync({
@@ -145,7 +150,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
 
     const decimals = props.collateral?.decimals || 0;
     const value = BigInt(
-      Math.floor(Number(collateralAmountWatched) * 10 ** decimals),
+      Math.floor(Number(collateralAmountWatched) * 10 ** decimals)
     );
 
     return value;
@@ -156,8 +161,8 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
       try {
         const inputAmount = BigInt(
           Math.floor(
-            Number(collateralAmount) * 10 ** (collateral.decimals as number),
-          ),
+            Number(collateralAmount) * 10 ** (collateral.decimals as number)
+          )
         );
 
         // Calculate USD value of added collateral
@@ -178,7 +183,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
           const newRatio =
             Number(
               (totalCollateralValue * BigInt(10000)) /
-                (position.debtUsdValue as bigint),
+                (position.debtUsdValue as bigint)
             ) / 100;
           setNewRatio(newRatio);
         }
@@ -188,7 +193,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
       }
     },
     [],
-    800,
+    800
   );
 
   useEffect(() => {
@@ -203,7 +208,7 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
       handleUpdateRatio(
         collateralAmountWatched,
         props.position,
-        props.collateral,
+        props.collateral
       );
     } else {
       setNewRatio(null);
@@ -252,13 +257,13 @@ export const DepositDialog = ({ ...props }: PositionDialogProps) => {
                   const inputAmount = BigInt(
                     Math.floor(
                       Number(value) *
-                        10 ** (props.collateral?.decimals as number),
-                    ),
+                        10 ** (props.collateral?.decimals as number)
+                    )
                   );
                   console.log(
                     props.collateral,
                     props.collateral?.balance,
-                    inputAmount,
+                    inputAmount
                   );
                   const assetBalance = props.collateral?.balance as bigint;
 

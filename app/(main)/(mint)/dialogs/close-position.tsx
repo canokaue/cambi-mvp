@@ -84,7 +84,11 @@ export const ClosePositionDialog = ({ ...props }: PositionDialogProps) => {
 
       if ((syntheticBalance as bigint) < props.position.mintedAmount) {
         toast.error("Insufficient synthetic tokens", {
-          description: `You need ${parseBigInt(props.position.mintedAmount, 18, 6)} ${props.position.syntheticSymbol} to close this position`,
+          description: `You need ${parseBigInt(
+            props.position.mintedAmount,
+            18,
+            6
+          )} ${props.position.syntheticSymbol} to close this position`,
         });
         setIsSubmitting(false);
         return;
@@ -168,7 +172,7 @@ export const ClosePositionDialog = ({ ...props }: PositionDialogProps) => {
                   ? parseBigInt(
                       netCollateral,
                       props.collateral?.decimals || 0,
-                      4,
+                      4
                     )
                   : "0"}{" "}
                 {props.position?.collateralSymbol}

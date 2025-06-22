@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 // import { useTheme } from "next-themes"
-import { Toaster as Sonner, ToasterProps } from "sonner"
+import { Toaster as Sonner, ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
@@ -11,7 +11,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       style={
         {
           "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)", 
+          "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--toast-action-background-color": "#ddd759",
           "--toast-action-color": "#1c1b22",
@@ -26,11 +26,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
           border: "none",
           borderRadius: "6px",
           fontWeight: "500",
-        }
+        },
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };

@@ -74,7 +74,13 @@ import { DepositDialog } from "./dialogs/deposit";
 import { sendTxSentToast, sendTxSuccessToast } from "./dialogs/toasts";
 import { WithdrawalDialog } from "./dialogs/withdrawal";
 import { BackgroundDecorations } from "@/components/BackgroundDecorations";
-
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const TokenSelectorButton = ({
   selectedSymbol,
@@ -168,7 +174,7 @@ function getDecimalsPerCollateralSymbol(symbol: string): number {
 }
 
 function getInputDecimalsPerCollateralSymbol(
-  symbol: string | undefined,
+  symbol: string | undefined
 ): number {
   switch (symbol) {
     case "USDC":
@@ -262,7 +268,7 @@ export default function Home() {
         minCollateralRatio: item.minCollateralRatio,
         auctionDiscount: item.auctionDiscount,
         isActive: item.isActive,
-      }),
+      })
     );
   }, [syntheticAssetsContract.data]);
 
@@ -318,7 +324,7 @@ export default function Home() {
             address: constants.OracleInterfaceAddress,
             functionName: "getNormalizedPrice",
             args: [position.syntheticAsset],
-          }),
+          })
         );
 
         const prices = await Promise.all(pricePromises);
@@ -372,7 +378,7 @@ export default function Home() {
 
     const decimals = collateralWatched.decimals || 0;
     const value = BigInt(
-      Math.floor(Number(collateralAmountWatched) * 10 ** decimals),
+      Math.floor(Number(collateralAmountWatched) * 10 ** decimals)
     );
 
     return value;
@@ -412,7 +418,12 @@ export default function Home() {
         abi,
         address: data.collateral.tokenAddress,
         functionName: "approve",
-        args: [positionManagerAddress, BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")],
+        args: [
+          positionManagerAddress,
+          BigInt(
+            "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          ),
+        ],
       });
 
       sendTxSentToast(approvalTxHash);
@@ -422,7 +433,7 @@ export default function Home() {
         {
           hash: approvalTxHash,
           confirmations: 3,
-        },
+        }
       );
 
       sendTxSuccessToast(approvalConfirmationTxHash.transactionHash);
@@ -437,7 +448,7 @@ export default function Home() {
           data.mint.tokenAddress,
           data.collateral.tokenAddress,
           BigInt(
-            Math.floor(data.collateralAmount * 10 ** data.collateral.decimals),
+            Math.floor(data.collateralAmount * 10 ** data.collateral.decimals)
           ),
           BigInt(Math.floor(data.mintAmount * 10 ** 18)),
         ],
@@ -451,7 +462,7 @@ export default function Home() {
       });
 
       // const poolHash = constants.getUniswapPoolHash(data.mint.symbol)
-// 
+      //
       toast.success("Transaction confirmed.");
 
       await openPositionsContractCall.refetch();
@@ -526,13 +537,13 @@ export default function Home() {
         const abi = constants.LeprechaunLensABI;
         const address = constants.LENSAddress;
         const asset = collateralAssetsWithBalance.find(
-          (collateralAsset) => collateralAsset.symbol === collateral?.symbol,
+          (collateralAsset) => collateralAsset.symbol === collateral?.symbol
         );
 
         const inputAmount = BigInt(
           Math.floor(
-            Number(collateralAmount) * 10 ** (asset?.decimals as number),
-          ),
+            Number(collateralAmount) * 10 ** (asset?.decimals as number)
+          )
         );
 
         const res = await readContract(wagmiConfig, {
@@ -560,7 +571,7 @@ export default function Home() {
       }
     },
     [],
-    800,
+    800
   );
 
   const [loadingMintedAmount, setLoadingMintedAmount] = useState(false);
@@ -593,7 +604,7 @@ export default function Home() {
 
   const selectedPositionCollateral = useMemo(() => {
     return collateralAssetsWithBalance.find(
-      (it) => it.symbol === selectedPosition?.collateralSymbol,
+      (it) => it.symbol === selectedPosition?.collateralSymbol
     );
   }, [collateralAssetsWithBalance, selectedPosition]);
 
@@ -628,549 +639,670 @@ export default function Home() {
   // Mock APY calculation based on lock period
   const targetAPY = useMemo(() => {
     switch (lockPeriodWatched) {
-      case 3: return 8.0;
-      case 6: return 10.0;
-      case 12: return 11.0;
-      case 18: return 12.0;
-      default: return 8.0;
+      case 3:
+        return 8.0;
+      case 6:
+        return 10.0;
+      case 12:
+        return 11.0;
+      case 18:
+        return 12.0;
+      default:
+        return 8.0;
     }
   }, [lockPeriodWatched]);
 
   return (
     <div className="flex flex-col min-h-screen w-full relative z-10">
-      <BackgroundDecorations /> 
+      <BackgroundDecorations />
+      <TooltipProvider>
+        <DepositDialog
+          position={selectedPosition}
+          collateral={selectedPositionCollateral}
+          allowance={selectedPositionAllowance}
+          onSuccess={() => {
+            // Refresh user positions
+            openPositionsContractCall.refetch();
+            // Refresh allowances and balances
+            allowanceAndBalanceContract.refetch();
+          }}
+          open={openDialog === "deposit"}
+          onOpenChange={(v) =>
+            v ? setOpenDialog("deposit") : setOpenDialog(null)
+          }
+        />
+        <WithdrawalDialog
+          position={selectedPosition}
+          collateral={selectedPositionCollateral}
+          allowance={selectedPositionAllowance}
+          onSuccess={() => {
+            // Refresh user positions
+            openPositionsContractCall.refetch();
+            // Refresh allowances and balances
+            allowanceAndBalanceContract.refetch();
+          }}
+          open={openDialog === "withdrawal"}
+          onOpenChange={(v) =>
+            v ? setOpenDialog("withdrawal") : setOpenDialog(null)
+          }
+        />
+        <ClosePositionDialog
+          position={selectedPosition}
+          collateral={selectedPositionCollateral}
+          onSuccess={() => {
+            // Refresh user positions
+            openPositionsContractCall.refetch();
+            // Refresh allowances and balances
+            allowanceAndBalanceContract.refetch();
+          }}
+          open={openDialog === "close-position"}
+          onOpenChange={(v) =>
+            v ? setOpenDialog("close-position") : setOpenDialog(null)
+          }
+        />
 
-      <DepositDialog
-        position={selectedPosition}
-        collateral={selectedPositionCollateral}
-        allowance={selectedPositionAllowance}
-        onSuccess={() => {
-          // Refresh user positions
-          openPositionsContractCall.refetch();
-          // Refresh allowances and balances
-          allowanceAndBalanceContract.refetch();
-        }}
-        open={openDialog === "deposit"}
-        onOpenChange={(v) =>
-          v ? setOpenDialog("deposit") : setOpenDialog(null)
-        }
-      />
-      <WithdrawalDialog
-        position={selectedPosition}
-        collateral={selectedPositionCollateral}
-        allowance={selectedPositionAllowance}
-        onSuccess={() => {
-          // Refresh user positions
-          openPositionsContractCall.refetch();
-          // Refresh allowances and balances
-          allowanceAndBalanceContract.refetch();
-        }}
-        open={openDialog === "withdrawal"}
-        onOpenChange={(v) =>
-          v ? setOpenDialog("withdrawal") : setOpenDialog(null)
-        }
-      />
-      <ClosePositionDialog
-        position={selectedPosition}
-        collateral={selectedPositionCollateral}
-        onSuccess={() => {
-          // Refresh user positions
-          openPositionsContractCall.refetch();
-          // Refresh allowances and balances
-          allowanceAndBalanceContract.refetch();
-        }}
-        open={openDialog === "close-position"}
-        onOpenChange={(v) =>
-          v ? setOpenDialog("close-position") : setOpenDialog(null)
-        }
-      />
-
-      <Header activeRoute="mint" />
-      <main className="flex flex-col gap-5 flex-1 items-center justify-center mb-[20vh] px-6">
-        <Card className="w-2xl">
-          <CardHeader>
-            <CardTitle>Mint Mock Collateral</CardTitle>
-            <CardDescription>
-              Mint mock collateral to test the protocol.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                variant="default"  // Change from "secondary" to "default"
-                disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("USDC")}
-              >
-                USDC
-              </Button>
-
-              <Button
-                variant="default"  // Change from "secondary" to "default"
-                disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("WETH")}
-              >
-                WETH
-              </Button>
-
-              <Button
-                variant="default"  // Change from "secondary" to "default"
-                disabled={account.status !== "connected"}
-                onClick={() => mintMockCollateral("WBTC")}
-              >
-                WBTC
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="w-2xl">
-          <Form {...form}>
+        <Header activeRoute="mint" />
+        <main className="flex flex-col gap-5 flex-1 items-center justify-center mb-8 sm:mb-[20vh] px-4 sm:px-6 py-4">
+          <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-              <CardTitle>Mint</CardTitle>
+              <CardTitle>Mint Mock Collateral</CardTitle>
               <CardDescription>
-                Enter the amount of collateral and minted tokens.
+                Mint mock collateral to test the protocol.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4 **:data-[slot=input]:text-lg">
-                <FormField
-                  control={form.control}
-                  name="collateralAmount"
-                  rules={{
-                    required: "Amount is required",
-                    validate: {
-                      isNumber: (value) => {
-                        return (
-                          typeof value === "number" || "Amount must be a number"
-                        );
-                      },
-                      isPositive: (value) => {
-                        return value > 0 || "Amount must be greater than 0";
-                      },
-                      withinBalance: (value) => {
-                        const collateral = form.getValues().collateral;
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant="default" // Change from "secondary" to "default"
+                  disabled={account.status !== "connected"}
+                  onClick={() => mintMockCollateral("USDC")}
+                >
+                  USDC
+                </Button>
 
-                        const asset = collateralAssetsWithBalance.find(
-                          (collateralAsset) =>
-                            collateralAsset.symbol === collateral?.symbol,
-                        );
+                <Button
+                  variant="default" // Change from "secondary" to "default"
+                  disabled={account.status !== "connected"}
+                  onClick={() => mintMockCollateral("WETH")}
+                >
+                  WETH
+                </Button>
 
-                        const inputAmount = BigInt(
-                          Math.floor(
-                            Number(value) * 10 ** (asset?.decimals as number),
-                          ),
-                        );
-                        const assetBalance = asset?.balance as bigint;
-
-                        return (
-                          inputAmount <= assetBalance ||
-                          "Amount must be within balance"
-                        );
-                      },
-                    },
-                  }}
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Collateral</FormLabel>
-                      <div className="flex items-end gap-2">
-                        <FormControl>
-                          <DecimalInput
-                            key={collateralWatched?.symbol}
-                            className="h-14"
-                            placeholder={`0.${"0".repeat(
-                              getInputDecimalsPerCollateralSymbol(
-                                collateralWatched?.symbol,
-                              ),
-                            )}`}
-                            digits={getInputDecimalsPerCollateralSymbol(
-                              collateralWatched?.symbol,
-                            )}
-                            {...field}
-                            disabled={!collateralWatched}
-                          />
-                        </FormControl>
-
-                        <FormField
-                          name="collateral"
-                          control={form.control}
-                          rules={{
-                            required: true,
-                          }}
-                          render={({ field }) => (
-                            <Dialog
-                              open={collateralTokenSelectorOpen}
-                              onOpenChange={setCollateralTokenSelectorOpen}
-                            >
-                              <DialogTrigger asChild>
-                                <TokenSelectorButton
-                                  disabled={account.status !== "connected"}
-                                  className="h-14"
-                                  selectedSymbol={field.value?.symbol}
-                                />
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogTitle>Token Selector</DialogTitle>
-                                <DialogDescription>
-                                  Select the token you want to use as
-                                  collateral.
-                                </DialogDescription>
-                                <TokenSelector
-                                  tokens={collateralAssetsWithBalance}
-                                  onSelect={(token) => {
-                                    field.onChange(token);
-                                    form.setValue(
-                                      "collateralAmount",
-                                      undefined,
-                                    );
-                                    setCollateralTokenSelectorOpen(false);
-                                  }}
-                                />
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="mintAmount"
-                  rules={{
-                    required: "Amount is required",
-                    validate: {
-                      isNumber: (value) => {
-                        return (
-                          typeof value === "number" || "Amount must be a number"
-                        );
-                      },
-                      isPositive: (value) => {
-                        return value > 0 || "Amount must be greater than 0";
-                      },
-                    },
-                  }}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>
-                        Minted
-                        {loadingMintedAmount && (
-                          <Loader2 className="animate-spin size-3" />
-                        )}
-                      </FormLabel>
-                      <div className="flex items-end gap-2">
-                        <FormControl>
-                          <Input
-                            className="h-14"
-                            {...field}
-                            value={(field.value || 0).toLocaleString(
-                              undefined,
-                              {
-                                minimumFractionDigits: 2,
-                              },
-                            )}
-                            disabled
-                          />
-                        </FormControl>
-                        <FormField
-                          name="mint"
-                          control={form.control}
-                          rules={{
-                            required: true,
-                          }}
-                          render={({ field }) => (
-                            <Dialog
-                              open={mintTokenSelectorOpen}
-                              onOpenChange={setMintTokenSelectorOpen}
-                            >
-                              <DialogTrigger asChild>
-                                <TokenSelectorButton
-                                  disabled={account.status !== "connected"}
-                                  className="h-14"
-                                  selectedSymbol={field.value?.symbol}
-                                />
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogTitle>Token Selector</DialogTitle>
-                                <DialogDescription>
-                                  Select the token you want to mint.
-                                </DialogDescription>
-                                <TokenSelector
-                                  tokens={formattedAssets}
-                                  onSelect={(token) => {
-                                    field.onChange(token);
-                                    setMintTokenSelectorOpen(false);
-                                  }}
-                                />
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="collateralRatio"
-                  defaultValue={115}
-                  // rules={{
-                  //   required: "Collateral Ratio is required",
-                  //   min: {
-                  //     value: 150,
-                  //     message: "Collateral Ratio must be at least 150%",
-                  //   },
-                  //   max: {
-                  //     value: 250,
-                  //     message: "Collateral Ratio must be at most 250%",
-                  //   },
-                  // }}
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="mb-2">
-                        Collateral Ratio ({collateralRatioWatched}%)
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={minCollateralRatio}
-                          max={250}
-                          {...field}
-                          value={[field.value]}
-                          onValueChange={(value) => {
-                            field.onChange(value[0]);
-                          }}
-                        />
-                      </FormControl>
-                      <span
-                        className={cn(
-                          "flex flex-row justify-between text-neutral-400",
-                          {
-                            "text-destructive": !!fieldState.error,
-                          },
-                        )}
-                      >
-                        <span>{minCollateralRatio}%</span>
-                        <span>250%</span>
-                      </span>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lockPeriod"
-                  defaultValue={3}
-                  rules={{
-                    required: "Lock period is required",
-                  }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="mb-2">
-                        Lock Period ({lockPeriodWatched} months) - Target APY: {targetAPY}%
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={3}
-                          max={12}
-                          step={3}
-                          {...field}
-                          value={[field.value]}
-                          onValueChange={(value) => {
-                            field.onChange(value[0]);
-                          }}
-                        />
-                      </FormControl>
-                      <span className="flex flex-row justify-between text-neutral-400">
-                        <span>3 months</span>
-                        <span>6 months</span>
-                        <span>12 months</span>
-                        <span>18 months</span>
-                      </span>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex flex-col w-full mt-2">
-                  <Button
-                    disabled={
-                      account.status !== "connected" ||
-                      loadingMintedAmount ||
-                      form.formState.isSubmitting
-                    }
-                    onClick={handleSubmitMint}
-                  >
-                    {form.formState.isSubmitting && (
-                      <Loader2 className="animate-spin size-3" />
-                    )}
-                    <span>
-                      {collateralWatched &&
-                      allowance &&
-                      cleanCollateralAmount &&
-                      allowance >= cleanCollateralAmount
-                        ? "Mint"
-                        : "Approve"}
-                    </span>
-                  </Button>
-                </div>
-                <CardFooter>
-                </CardFooter>
+                <Button
+                  variant="default" // Change from "secondary" to "default"
+                  disabled={account.status !== "connected"}
+                  onClick={() => mintMockCollateral("WBTC")}
+                >
+                  WBTC
+                </Button>
               </div>
             </CardContent>
-          </Form>
-        </Card>
+          </Card>
 
-        <Card className="w-2xl">
-          <CardHeader>
-            <CardTitle>Your Positions</CardTitle>
-            <CardDescription>
-              These are the positions you currently have for the connected
-              wallet.
-            </CardDescription>
-          </CardHeader>
+          <Card className="w-full max-w-2xl mx-auto">
+            <Form {...form}>
+              <CardHeader>
+                <CardTitle>Mint</CardTitle>
+                <CardDescription>
+                  Enter the amount of collateral and minted tokens.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4 **:data-[slot=input]:text-lg">
+                  <FormField
+                    control={form.control}
+                    name="collateralAmount"
+                    rules={{
+                      required: "Amount is required",
+                      validate: {
+                        isNumber: (value) => {
+                          return (
+                            typeof value === "number" ||
+                            "Amount must be a number"
+                          );
+                        },
+                        isPositive: (value) => {
+                          return value > 0 || "Amount must be greater than 0";
+                        },
+                        withinBalance: (value) => {
+                          const collateral = form.getValues().collateral;
 
-          <CardContent>
-            {account.status === "connected" && (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Asset</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Collateral</TableHead>
-                    <TableHead>Current Ratio</TableHead>
-                    <TableHead>Liq. Ratio</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pricedPositions ? (
-                    pricedPositions
-                      .filter((position) => position.isActive)
-                      .map((position) => (
-                        <TableRow key={position.positionId}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Image
-                                src={assetsImages[position.syntheticSymbol]}
-                                alt={`${position.syntheticSymbol} Icon`}
-                                className="rounded-full"
-                                width={16}
-                                height={16}
-                              />
-                              <span className="leading-none">
-                                {position.syntheticSymbol}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {parseBigInt(position.mintedAmount, 18, 3)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Image
-                                src={
-                                  assetsImages[position.collateralSymbol || ""]
-                                }
-                                alt={`${position.collateralSymbol} Icon`}
-                                className="rounded-full"
-                                width={16}
-                                height={16}
-                              />
-                              {parseBigInt(
-                                position.collateralAmount,
-                                getDecimalsPerCollateralSymbol(
-                                  position.collateralSymbol,
-                                ),
-                                4,
+                          const asset = collateralAssetsWithBalance.find(
+                            (collateralAsset) =>
+                              collateralAsset.symbol === collateral?.symbol
+                          );
+
+                          const inputAmount = BigInt(
+                            Math.floor(
+                              Number(value) * 10 ** (asset?.decimals as number)
+                            )
+                          );
+                          const assetBalance = asset?.balance as bigint;
+
+                          return (
+                            inputAmount <= assetBalance ||
+                            "Amount must be within balance"
+                          );
+                        },
+                      },
+                    }}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel className="flex items-center gap-2">
+                          Collateral
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button type="button">
+                                  <Info className="size-4 text-muted-foreground cursor-help" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  The asset you deposit to back your synthetic
+                                  tokens. This secures your position and can be
+                                  withdrawn later.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+                        <div className="flex items-end gap-2">
+                          <FormControl>
+                            <DecimalInput
+                              key={collateralWatched?.symbol}
+                              className="h-14"
+                              placeholder={`0.${"0".repeat(
+                                getInputDecimalsPerCollateralSymbol(
+                                  collateralWatched?.symbol
+                                )
+                              )}`}
+                              digits={getInputDecimalsPerCollateralSymbol(
+                                collateralWatched?.symbol
                               )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {parseBigInt(position.currentRatio as bigint, 2, 2)}
-                            %
-                          </TableCell>
-                          <TableCell>
-                            {parseBigInt(
-                              position.requiredRatio as bigint,
-                              2,
-                              2,
-                            )}
-                            %
-                          </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="px-1">
-                                  <EllipsisVertical className="size-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setSelectedPosition(position);
-                                    setOpenDialog("deposit");
-                                  }}
-                                >
-                                  <BanknoteArrowUp className="mr-2 size-4" />
-                                  Deposit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    // Log the position data to confirm it exists
-                                    console.log(
-                                      "Position data for withdrawal:",
-                                      position,
-                                    );
+                              {...field}
+                              disabled={!collateralWatched}
+                            />
+                          </FormControl>
 
-                                    setSelectedPosition(position);
-                                    setOpenDialog("withdrawal");
-                                  }}
-                                >
-                                  <BanknoteArrowDown className="mr-2 size-4" />
-                                  Withdraw
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    console.log(
-                                      "Position data for close:",
-                                      position,
-                                    );
-                                    setSelectedPosition(position);
-                                    setOpenDialog("close-position");
-                                  }}
-                                >
-                                  <BanknoteX className="mr-2 size-4" />
-                                  Close Position
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  ) : (
+                          <FormField
+                            name="collateral"
+                            control={form.control}
+                            rules={{
+                              required: true,
+                            }}
+                            render={({ field }) => (
+                              <Dialog
+                                open={collateralTokenSelectorOpen}
+                                onOpenChange={setCollateralTokenSelectorOpen}
+                              >
+                                <DialogTrigger asChild>
+                                  <TokenSelectorButton
+                                    disabled={account.status !== "connected"}
+                                    className="h-14"
+                                    selectedSymbol={field.value?.symbol}
+                                  />
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogTitle>Token Selector</DialogTitle>
+                                  <DialogDescription>
+                                    Select the token you want to use as
+                                    collateral.
+                                  </DialogDescription>
+                                  <TokenSelector
+                                    tokens={collateralAssetsWithBalance}
+                                    onSelect={(token) => {
+                                      field.onChange(token);
+                                      form.setValue(
+                                        "collateralAmount",
+                                        undefined
+                                      );
+                                      setCollateralTokenSelectorOpen(false);
+                                    }}
+                                  />
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          />
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mintAmount"
+                    rules={{
+                      required: "Amount is required",
+                      validate: {
+                        isNumber: (value) => {
+                          return (
+                            typeof value === "number" ||
+                            "Amount must be a number"
+                          );
+                        },
+                        isPositive: (value) => {
+                          return value > 0 || "Amount must be greater than 0";
+                        },
+                      },
+                    }}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel className="flex items-center gap-2">
+                          Minted
+                          {loadingMintedAmount && (
+                            <Loader2 className="animate-spin size-3" />
+                          )}
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="size-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  The amount of synthetic tokens you'll receive.
+                                  These tokens earn yield through daily
+                                  rebasing.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+                        <div className="flex items-end gap-2">
+                          <FormControl>
+                            <Input
+                              className="h-14"
+                              {...field}
+                              value={(field.value || 0).toLocaleString(
+                                undefined,
+                                {
+                                  minimumFractionDigits: 2,
+                                }
+                              )}
+                              disabled
+                            />
+                          </FormControl>
+                          <FormField
+                            name="mint"
+                            control={form.control}
+                            rules={{
+                              required: true,
+                            }}
+                            render={({ field }) => (
+                              <Dialog
+                                open={mintTokenSelectorOpen}
+                                onOpenChange={setMintTokenSelectorOpen}
+                              >
+                                <DialogTrigger asChild>
+                                  <TokenSelectorButton
+                                    disabled={account.status !== "connected"}
+                                    className="h-14"
+                                    selectedSymbol={field.value?.symbol}
+                                  />
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogTitle>Token Selector</DialogTitle>
+                                  <DialogDescription>
+                                    Select the token you want to mint.
+                                  </DialogDescription>
+                                  <TokenSelector
+                                    tokens={formattedAssets}
+                                    onSelect={(token) => {
+                                      field.onChange(token);
+                                      setMintTokenSelectorOpen(false);
+                                    }}
+                                  />
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          />
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="collateralRatio"
+                    defaultValue={115}
+                    // rules={{
+                    //   required: "Collateral Ratio is required",
+                    //   min: {
+                    //     value: 150,
+                    //     message: "Collateral Ratio must be at least 150%",
+                    //   },
+                    //   max: {
+                    //     value: 250,
+                    //     message: "Collateral Ratio must be at most 250%",
+                    //   },
+                    // }}
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormLabel className="mb-2 flex items-center gap-2">
+                          Collateral Ratio ({collateralRatioWatched}%)
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="size-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  The percentage of collateral value compared to
+                                  your debt. Higher ratios provide more safety
+                                  against liquidation.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+
+                        <FormControl>
+                          <Slider
+                            min={minCollateralRatio}
+                            max={250}
+                            {...field}
+                            value={[field.value]}
+                            onValueChange={(value) => {
+                              field.onChange(value[0]);
+                            }}
+                          />
+                        </FormControl>
+                        <span
+                          className={cn(
+                            "flex flex-row justify-between text-neutral-400",
+                            {
+                              "text-destructive": !!fieldState.error,
+                            }
+                          )}
+                        >
+                          <span>{minCollateralRatio}%</span>
+                          <span>250%</span>
+                        </span>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lockPeriod"
+                    defaultValue={3}
+                    rules={{
+                      required: "Lock period is required",
+                    }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="mb-2 flex items-center gap-2">
+                          <span className="sm:hidden">
+                            Lock: {lockPeriodWatched}m
+                          </span>
+                          <span className="hidden sm:inline">
+                            Lock Period ({lockPeriodWatched} months)
+                          </span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="size-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  How long your assets will be locked. Longer
+                                  periods typically offer higher yields. You can
+                                  withdraw after the lock period ends.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+
+                        <FormControl>
+                          <Slider
+                            min={3}
+                            max={12}
+                            step={3}
+                            {...field}
+                            value={[field.value]}
+                            onValueChange={(value) => {
+                              field.onChange(value[0]);
+                            }}
+                          />
+                        </FormControl>
+                        <span className="flex flex-row justify-between text-neutral-400">
+                          <span className="sm:hidden">3m</span>
+                          <span className="hidden sm:inline">3 months</span>
+
+                          <span className="sm:hidden">6m</span>
+                          <span className="hidden sm:inline">6 months</span>
+
+                          <span className="sm:hidden">12m</span>
+                          <span className="hidden sm:inline">12 months</span>
+
+                          <span className="sm:hidden">18m</span>
+                          <span className="hidden sm:inline">18 months</span>
+                        </span>
+                        <div className="text-sm text-muted-foreground text-center mt-1">
+                          Target APY: {targetAPY}%
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-col w-full mt-2">
+                    <Button
+                      disabled={
+                        account.status !== "connected" ||
+                        loadingMintedAmount ||
+                        form.formState.isSubmitting
+                      }
+                      onClick={handleSubmitMint}
+                    >
+                      {form.formState.isSubmitting && (
+                        <Loader2 className="animate-spin size-3" />
+                      )}
+                      <span>
+                        {collateralWatched &&
+                        allowance &&
+                        cleanCollateralAmount &&
+                        allowance >= cleanCollateralAmount
+                          ? "Mint"
+                          : "Approve"}
+                      </span>
+                    </Button>
+                  </div>
+                  <CardFooter></CardFooter>
+                </div>
+              </CardContent>
+            </Form>
+          </Card>
+
+          <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle>Your Positions</CardTitle>
+              <CardDescription>
+                These are the positions you currently have for the connected
+                wallet.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              {account.status === "connected" && (
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell>No Positions</TableCell>
+                      <TableHead>Asset</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Collateral</TableHead>
+                      <TableHead>
+                        Current Ratio
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="size-3 text-muted-foreground cursor-help inline ml-1" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Your position's health ratio. Lower ratios
+                                increase liquidation risk.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableHead>
+
+                      <TableHead>
+                        Liq. Ratio
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="size-3 text-muted-foreground cursor-help inline ml-1" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                The minimum ratio required to avoid liquidation
+                                of your position.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
+                  </TableHeader>
+                  <TableBody>
+                    {pricedPositions ? (
+                      pricedPositions
+                        .filter((position) => position.isActive)
+                        .map((position) => (
+                          <TableRow key={position.positionId}>
+                            <TableCell className="pr-8 sm:pr-2">
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={assetsImages[position.syntheticSymbol]}
+                                  alt={`${position.syntheticSymbol} Icon`}
+                                  className="rounded-full"
+                                  width={16}
+                                  height={16}
+                                />
+                                <span className="leading-none">
+                                  {position.syntheticSymbol}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {parseBigInt(position.mintedAmount, 18, 3)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={
+                                    assetsImages[
+                                      position.collateralSymbol || ""
+                                    ]
+                                  }
+                                  alt={`${position.collateralSymbol} Icon`}
+                                  className="rounded-full"
+                                  width={16}
+                                  height={16}
+                                />
+                                {parseBigInt(
+                                  position.collateralAmount,
+                                  getDecimalsPerCollateralSymbol(
+                                    position.collateralSymbol
+                                  ),
+                                  4
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {parseBigInt(
+                                position.currentRatio as bigint,
+                                2,
+                                2
+                              )}
+                              %
+                            </TableCell>
+                            <TableCell>
+                              {parseBigInt(
+                                position.requiredRatio as bigint,
+                                2,
+                                2
+                              )}
+                              %
+                            </TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="px-1">
+                                    <EllipsisVertical className="size-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedPosition(position);
+                                      setOpenDialog("deposit");
+                                    }}
+                                  >
+                                    <BanknoteArrowUp className="mr-2 size-4" />
+                                    Deposit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      // Log the position data to confirm it exists
+                                      console.log(
+                                        "Position data for withdrawal:",
+                                        position
+                                      );
+
+                                      setSelectedPosition(position);
+                                      setOpenDialog("withdrawal");
+                                    }}
+                                  >
+                                    <BanknoteArrowDown className="mr-2 size-4" />
+                                    Withdraw
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      console.log(
+                                        "Position data for close:",
+                                        position
+                                      );
+                                      setSelectedPosition(position);
+                                      setOpenDialog("close-position");
+                                    }}
+                                  >
+                                    <BanknoteX className="mr-2 size-4" />
+                                    Close Position
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell>No Positions</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+              {(account.status === "disconnected" ||
+                account.status === "connecting") && (
+                <p>
+                  Connect your wallet to see your positions. If you don&apos;t
+                  have a wallet, you can create one using MetaMask.
+                </p>
+              )}
+            </CardContent>
             {(account.status === "disconnected" ||
               account.status === "connecting") && (
-              <p>
-                Connect your wallet to see your positions. If you don&apos;t
-                have a wallet, you can create one using MetaMask.
-              </p>
+              <CardFooter>
+                <CustomConnectButton className="w-full" />
+              </CardFooter>
             )}
-          </CardContent>
-          {(account.status === "disconnected" ||
-            account.status === "connecting") && (
-            <CardFooter>
-              <CustomConnectButton className="w-full" />
-            </CardFooter>
-          )}
-        </Card>
-      </main>
+          </Card>
+        </main>
+      </TooltipProvider>
     </div>
   );
 }
